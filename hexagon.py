@@ -1,6 +1,5 @@
 import pygame
 from button import Button
-from math import sqrt
 class Hexagon(Button):
     def __init__(self, surface, size, centre, colour, coords):
         self.surface = surface
