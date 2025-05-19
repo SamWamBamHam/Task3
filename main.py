@@ -1,5 +1,8 @@
 import pygame
 from hexArray import createHexArray, drawHexArray, revealTile, flagTile
+from hexagon import Hexagon
+from button import Button
+from buttonFuncs import findClosestButton
 
 pygame.init()
 mainSurface = pygame.display.set_mode((1280, 720))
@@ -10,6 +13,7 @@ firstFrame = True
 holdingLCtrl = False
 gameSize = 7
 font = pygame.font.Font()
+buttonList = []
 
 while running == True:
     for event in pygame.event.get():
@@ -25,17 +29,34 @@ while running == True:
         # When in the game, m1 reveals, ctrl + m1 flags, m2 flags and R starts a new game
         if menu == "game":
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if holdingLCtrl:
-                    if event.button == 1:
-                        flagTile(hexGrid, event.pos)
-                else:
-                    if event.button == 1:
-                        revealTile(hexGrid, event.pos, 30, True)
-                    elif event.button == 3:
-                        flagTile(hexGrid, event.pos)
+                position = event.pos
+                button = findClosestButton(buttonList, position)
+                if button != False:
+                    if isinstance(button, Hexagon):
+                        if holdingLCtrl:
+                            if event.button == 1:
+                                flagTile(hexGrid, button.getCoords())
+                        else:
+                            if event.button == 1:
+                                revealTile(hexGrid, button.getCoords(), 30, True)
+                            elif event.button == 3:
+                                flagTile(hexGrid, button.getCoords())
+                    else:
+                        pass
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_r:
+                    newButtonList = []
+                    for button in buttonList:
+                        if not isinstance(button, Hexagon):
+                            newButtonList.append(button)
+                    buttonList = newButtonList
+                    del newButtonList
+                    del hexGrid
                     hexGrid = createHexArray(gameSize, mainSurface, pixelSize)
+                    for row in hexGrid:
+                        for cell in row:
+                            if isinstance(cell, Button):
+                                buttonList.append(cell)
     mainSurface.fill("purple")
 
     #Render Start Here
@@ -46,6 +67,10 @@ while running == True:
         del font
         font = pygame.font.Font(size=pixelSize)
         hexGrid = createHexArray(gameSize, mainSurface, pixelSize)
+        for row in hexGrid:
+            for cell in row:
+                if isinstance(cell, Hexagon):
+                    buttonList.append(cell)
         firstFrame = False
 
     drawHexArray(hexGrid, font)

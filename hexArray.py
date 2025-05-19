@@ -108,43 +108,20 @@ def collectHexReferences(grid):
                 hexes.append(cell)
     return hexes
 
-# This one too
-def findClosestHex(grid, coord):
-    closestHex = None
-    # The highest distance possible is 1280^2+720^2 which pales in comparison to integer limit (I hope)
-    closestDist = 2147483647
-    for hex in collectHexReferences(grid):
-        centre = hex.getCentre()
-        dist = (centre[0]-coord[0])**2+(centre[1]-coord[1])**2
-        if dist < closestDist:
-            closestDist = dist
-            closestHex = hex
-            tie = False
-        elif dist == closestDist:
-            tie = True
-            # I don't want to leave things up to chance for the player (besides the game itself), so no equally valid clicks
-    size = closestHex.getSize()
-    if closestDist > size*size*3.1416:
-        return False
-    else:
-        return (closestHex, tie)
-
 def revealTile(grid, coord, minePercentage=0, doSpread = False):
-    if findClosestHex(grid, coord) != False:
-        hexes = collectHexReferences(grid)
-        tie = False
+    hexes = collectHexReferences(grid)
+    closestHex = grid[coord[1]][coord[0]]
+    if isinstance(closestHex, Hexagon):
         firstClick = True
-        closestHex, tie = findClosestHex(grid, coord)
         for hex in hexes:
             if hex.getRevealed():
                 firstClick = False
         if firstClick:
             # After the first click we distribute mines. Therefore the first click is always safe.
             # Common feature in minesweeper, known as Safe Start
-            cHCoords = closestHex.getCoords()
-            safeSquareCoords = (cHCoords, (cHCoords[0]+1, cHCoords[1]+1), (cHCoords[0]+1, cHCoords[1]-1), (cHCoords[0]-1, cHCoords[1]+1), (cHCoords[0]-1, cHCoords[1]-1), (cHCoords[0], cHCoords[1]+2), (cHCoords[0], cHCoords[1]-2))
+            safeSquareCoords = (coord, (coord[0]+1, coord[1]+1), (coord[0]+1, coord[1]-1), (coord[0]-1, coord[1]+1), (coord[0]-1, coord[1]-1), (coord[0], coord[1]+2), (coord[0], coord[1]-2))
             distributeMines(grid, minePercentage, safeSquareCoords)
-        if (not tie) and (not closestHex.getFlagged()):
+        if not closestHex.getFlagged():
             if closestHex.getRevealed():
                 # For QOL, if you click a cell with enough flags around it to fill it if they were mines,
                 # it reveals all tiles besides the flagged ones. I got the idea from cardgames.com/minesweeper
@@ -164,26 +141,22 @@ def revealTile(grid, coord, minePercentage=0, doSpread = False):
                             currentNeighbour = grid[coord[1]][coord[0]]
                             if isinstance(currentNeighbour, Hexagon):
                                 if not currentNeighbour.getFlagged():
-                                    revealTile(grid, currentNeighbour.getCentre())
+                                    revealTile(grid, currentNeighbour.getCoords())
             else:
                 # Its Zero Spread time (common feature), where since a 0 must have all non-mine tiles around it, they are revealed.
                 # Makes for some rewarding moments as a chunk of the grid is revealed
                 isZero = closestHex.reveal()
                 # When revealing a tile, it returns with true if you should keep revealing. Only triggered when zero
                 if isZero:
-                    cHCentre = closestHex.getCentre()
-                    cHSize = closestHex.getSize()
-                    sqrt3 = sqrt(3)
-                    revealTile(grid, (cHCentre[0] + 1.5*cHSize, cHCentre[1]+sqrt3/2*cHSize))
-                    revealTile(grid, (cHCentre[0] + 1.5*cHSize, cHCentre[1]-sqrt3/2*cHSize))
-                    revealTile(grid, (cHCentre[0] - 1.5*cHSize, cHCentre[1]+sqrt3/2*cHSize))
-                    revealTile(grid, (cHCentre[0] - 1.5*cHSize, cHCentre[1]-sqrt3/2*cHSize))
-                    revealTile(grid, (cHCentre[0], cHCentre[1]+sqrt3*cHSize))
-                    revealTile(grid, (cHCentre[0], cHCentre[1]-sqrt3*cHSize))
+                    revealTile(grid, (coord[0]+1, coord[1]+1))
+                    revealTile(grid, (coord[0]+1, coord[1]-1))
+                    revealTile(grid, (coord[0]-1, coord[1]+1))
+                    revealTile(grid, (coord[0]-1, coord[1]-1))
+                    revealTile(grid, (coord[0], coord[1]+2))
+                    revealTile(grid, (coord[0], coord[1]-2))
 
 # Might be fun to have an essential game mechanic
 def flagTile(grid, coord):
-    if findClosestHex(grid, coord) != False:
-        closestHex, tie = findClosestHex(grid, coord)
-        if (not tie) and (not closestHex.getRevealed()):
-            closestHex.flag()
+    closestHex = grid[coord[1]][coord[0]]
+    if not closestHex.getRevealed():
+        closestHex.flag()
