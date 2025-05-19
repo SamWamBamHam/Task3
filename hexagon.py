@@ -13,6 +13,7 @@ class Hexagon(Button):
         self.mineCount = -1
         self.flagged = False
         self.coords = coords
+        self.clickRadius = size
 
     def setMineCount(self, count):
         self.mineCount = count
@@ -37,9 +38,6 @@ class Hexagon(Button):
 
     def getColour(self):
         return self.colour
-
-    def getCentre(self):
-        return self.centre
 
     def getRevealedColour(self):
         return self.revealedColour
