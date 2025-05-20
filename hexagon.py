@@ -14,7 +14,8 @@ class Hexagon(Button):
         self.flagged = False
         self.coords = coords
         self.clickRadius = size
-        self.menu = "hex"
+        self.title = "hex"
+        self.isCircle = True
 
     def setMineCount(self, count):
         self.mineCount = count

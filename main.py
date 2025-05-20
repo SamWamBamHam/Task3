@@ -12,7 +12,8 @@ menu = "main"
 firstFrame = True
 holdingLCtrl = False
 gameSize = 7
-font = pygame.font.Font()
+regFont = pygame.font.Font(size = 30)
+bigFont = pygame.font.Font(size = 60)
 buttonList = []
 hexGrid = None
 
@@ -28,49 +29,60 @@ while running == True:
             if event.key == 1073742048:
                 holdingLCtrl = False
         # When in the game, m1 reveals, ctrl + m1 flags, m2 flags and R starts a new game
-        if menu == "hex":
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                position = event.pos
-                button = findClosestButton(buttonList, position)
-                if button != False:
-                    if isinstance(button, Hexagon):
-                        if holdingLCtrl:
-                            if event.button == 1:
-                                flagTile(hexGrid, button.getCoords())
+        match menu:
+            case "main":
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == 1:
+                        closestButton = findClosestButton(buttonList, event.pos)
+                        if closestButton != False:
+                            function = closestButton.getClickFunction()
+                            if function:
+                                function()
+                            if button.getTitle() == "goToHex":
+                                firstFrame = True
+                                menu = "hex"
+            case "hex":
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    position = event.pos
+                    button = findClosestButton(buttonList, position)
+                    if button != False:
+                        if isinstance(button, Hexagon):
+                            if holdingLCtrl:
+                                if event.button == 1:
+                                    flagTile(hexGrid, button.getCoords())
+                            else:
+                                if event.button == 1:
+                                    revealTile(hexGrid, button.getCoords(), 30, True)
+                                elif event.button == 3:
+                                    flagTile(hexGrid, button.getCoords())
                         else:
-                            if event.button == 1:
-                                revealTile(hexGrid, button.getCoords(), 30, True)
-                            elif event.button == 3:
-                                flagTile(hexGrid, button.getCoords())
-                    else:
-                        pass
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_r:
-                    newButtonList = []
-                    for button in buttonList:
-                        if not isinstance(button, Hexagon):
-                            newButtonList.append(button)
-                    buttonList = newButtonList
-                    del newButtonList
-                    hexGrid = createHexArray(gameSize, mainSurface, pixelSize)
-                    for row in hexGrid:
-                        for cell in row:
-                            if isinstance(cell, Button):
-                                buttonList.append(cell)
+                            pass
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_r:
+                        newButtonList = []
+                        for button in buttonList:
+                            if not isinstance(button, Hexagon):
+                                newButtonList.append(button)
+                        buttonList = newButtonList
+                        del newButtonList
+                        hexGrid = createHexArray(gameSize, mainSurface, pixelSize)
+                        for row in hexGrid:
+                            for cell in row:
+                                if isinstance(cell, Button):
+                                    buttonList.append(cell)
     
     mainSurface.fill("purple")
 
     #Render Start Here
     if firstFrame:
+        buttonList = []
         match menu:
             case "main":
-                #buttonList.append(Button())
-                # CHANGE TEMP DO SOMETHING
+                buttonList.append(Button((640, 440), 100, 60, False, mainSurface, (112, 142, 160), "Go to hex", regFont, "goToHex"))
                 pass
             case "hex":
                 pixelSize = 30
-                del font
-                font = pygame.font.Font(size=pixelSize)
+                hexFont = pygame.font.Font(size=pixelSize)
                 hexGrid = createHexArray(gameSize, mainSurface, pixelSize)
                 for row in hexGrid:
                     for cell in row:
@@ -80,11 +92,11 @@ while running == True:
     else:
         match menu:
             case "main":
-                menu = "hex"
-                firstFrame = True
+                for button in buttonList:
+                    button.drawSelf()
             case "hex":
                 mainSurface.fill((185, 226, 245))
-                drawHexArray(hexGrid, font)
+                drawHexArray(hexGrid, hexFont)
 
     #Render End Here
 

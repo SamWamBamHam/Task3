@@ -1,8 +1,7 @@
 import pygame
 class Button():
-    def __init__(self, centre, menu, width, height, isCircle, surface, colour, text, clickFunction):
+    def __init__(self, centre, width, height, isCircle, surface, colour, text, font, uniqueTitle, clickFunction = None):
         self.centre = centre
-        self.menu = menu
         if isCircle:
             self.isCircle = True
             self.clickRadius = width/2
@@ -14,9 +13,17 @@ class Button():
         self.colour = colour
         self.text = text
         self.clickFunction = clickFunction
+        self.font = font
+        self.title = uniqueTitle
+
+    def getTitle(self):
+        return self.title
 
     def getText(self):
         return self.text
+    
+    def getFont(self):
+        return self.font
 
     def getClickFunction(self):
         return self.clickFunction
@@ -33,9 +40,6 @@ class Button():
     def getClickRadius(self):
         return self.clickRadius
     
-    def getMenu(self):
-        return self.menu
-    
     def getIsCircle(self):
         return self.isCircle
     
@@ -45,16 +49,20 @@ class Button():
     def getHeight(self):
         return self.height
     
-    def drawSelf(self, font):
+    def drawSelf(self):
+        centre = self.getCentre()
         if self.getIsCircle():
-            pygame.draw.circle(self.getSurface(), self.getColour(), self.getCentre(), self.getClickRadius())
-            pygame.draw.circle(self.getSurface(), 0, self.getCentre(), self.getClickRadius(), round(self.getClickRadius()/10))
+            pygame.draw.circle(self.getSurface(), self.getColour(), centre, self.getClickRadius())
+            pygame.draw.circle(self.getSurface(), 0, centre, self.getClickRadius(), round(self.getClickRadius()/10))
         else:
-            centre = self.getCentre()
             width = self.getWidth()
             height = self.getHeight()
             corners = ((centre[0]+width/2, centre[1]+height/2), (centre[0]+width/2, centre[1]-height/2), (centre[0]-width/2, centre[1]-height/2), (centre[0]-width/2, centre[1]+height/2))
             pygame.draw.polygon(self.getSurface(), self.getColour(), corners)
-            pygame.draw.polygon(self.getSurface(), 0, corners, round((width**2+height**2)/10))
+            pygame.draw.polygon(self.getSurface(), 0, corners, round((width+height)/35))
+        font = self.getFont()
+        text = self.getText()
         assert isinstance(font, pygame.font.Font)
-        font.render(self.getText(), False, 0)
+        textSurface = font.render(text, False, 0)
+        sizeOf = font.size(text)
+        self.getSurface().blit(textSurface, (centre[0]-sizeOf[0]/2, centre[1]-sizeOf[1]/2))
