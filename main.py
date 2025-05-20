@@ -14,6 +14,7 @@ holdingLCtrl = False
 gameSize = 7
 font = pygame.font.Font()
 buttonList = []
+hexGrid = None
 
 while running == True:
     for event in pygame.event.get():
@@ -27,7 +28,7 @@ while running == True:
             if event.key == 1073742048:
                 holdingLCtrl = False
         # When in the game, m1 reveals, ctrl + m1 flags, m2 flags and R starts a new game
-        if menu == "game":
+        if menu == "hex":
             if event.type == pygame.MOUSEBUTTONDOWN:
                 position = event.pos
                 button = findClosestButton(buttonList, position)
@@ -51,29 +52,39 @@ while running == True:
                             newButtonList.append(button)
                     buttonList = newButtonList
                     del newButtonList
-                    del hexGrid
                     hexGrid = createHexArray(gameSize, mainSurface, pixelSize)
                     for row in hexGrid:
                         for cell in row:
                             if isinstance(cell, Button):
                                 buttonList.append(cell)
+    
     mainSurface.fill("purple")
 
     #Render Start Here
-
     if firstFrame:
-        menu = "game"
-        pixelSize = 30
-        del font
-        font = pygame.font.Font(size=pixelSize)
-        hexGrid = createHexArray(gameSize, mainSurface, pixelSize)
-        for row in hexGrid:
-            for cell in row:
-                if isinstance(cell, Hexagon):
-                    buttonList.append(cell)
+        match menu:
+            case "main":
+                #buttonList.append(Button())
+                # CHANGE TEMP DO SOMETHING
+                pass
+            case "hex":
+                pixelSize = 30
+                del font
+                font = pygame.font.Font(size=pixelSize)
+                hexGrid = createHexArray(gameSize, mainSurface, pixelSize)
+                for row in hexGrid:
+                    for cell in row:
+                        if isinstance(cell, Hexagon):
+                            buttonList.append(cell)
         firstFrame = False
-
-    drawHexArray(hexGrid, font)
+    else:
+        match menu:
+            case "main":
+                menu = "hex"
+                firstFrame = True
+            case "hex":
+                mainSurface.fill((185, 226, 245))
+                drawHexArray(hexGrid, font)
 
     #Render End Here
 
