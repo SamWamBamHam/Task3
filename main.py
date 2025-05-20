@@ -1,5 +1,5 @@
 import pygame
-from hexArray import createHexArray, drawHexArray, revealTile, flagTile
+from hexArray import createHexArray, drawHexArray, revealTile, flagTile, countUnflagged
 from hexagon import Hexagon
 from button import Button
 from buttonFuncs import findClosestButton
@@ -96,6 +96,10 @@ while running == True:
                     button.drawSelf()
             case "hex":
                 mainSurface.fill((185, 226, 245))
+                unflaggedText = f"Mines: {countUnflagged(hexGrid)}"
+                if unflaggedText != "Mines: 0":
+                    unflaggedTextSurface = bigFont.render(unflaggedText, False, 0)
+                    mainSurface.blit(unflaggedTextSurface, (50, 50))
                 drawHexArray(hexGrid, hexFont)
 
     #Render End Here

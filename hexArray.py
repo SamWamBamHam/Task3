@@ -160,3 +160,13 @@ def flagTile(grid, coord):
     closestHex = grid[coord[1]][coord[0]]
     if not closestHex.getRevealed():
         closestHex.flag()
+
+def countUnflagged(grid):
+    hexes = collectHexReferences(grid)
+    mines, flags = (0, 0)
+    for hex in hexes:
+        if hex.getFlagged():
+            flags += 1
+        if hex.getMine():
+            mines += 1
+    return (mines - flags)
