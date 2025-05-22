@@ -75,7 +75,6 @@ while running == True:
                         function()
             if holdingEsc:
                 escCounter += 1
-                print(escCounter)
                 if escCounter == 120:
                     quit()
             else:
