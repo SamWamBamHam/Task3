@@ -1,7 +1,7 @@
 import pygame
 from button import Button
 class Hexagon(Button):
-    def __init__(self, surface, size, centre, colour, coords):
+    def __init__(self, surface, size: int, centre: tuple, colour: tuple, coords: tuple):
         self.surface = surface
         self.centre = centre
         self.size = size
@@ -17,7 +17,7 @@ class Hexagon(Button):
         self.title = "hex"
         self.isCircle = True
 
-    def setMineCount(self, count):
+    def setMineCount(self, count: int):
         self.mineCount = count
 
     def getCoords(self):
@@ -41,7 +41,7 @@ class Hexagon(Button):
     def getRevealedColour(self):
         return self.revealedColour
 
-    def setRevealed(self, revealed):
+    def setRevealed(self, revealed: bool):
         self.revealed = revealed
 
     def getRevealed(self):
@@ -50,7 +50,7 @@ class Hexagon(Button):
     def getFlagged(self):
         return self.flagged
 
-    def setFlagged(self, flagged):
+    def setFlagged(self, flagged: bool):
         self.flagged = flagged
     
     def flag(self):
@@ -70,7 +70,7 @@ class Hexagon(Button):
             return False
         # Returns whether or not 0, therefore whether or not to reveal adjacent tiles
 
-    def drawFlag(self, sqrt3):
+    def drawFlag(self, sqrt3: float):
         # Draws 3 different things, the flag base, the red flag and the flag pole
         # Flag pole last because I want it to be visible over the red flag
         centre = self.getCentre()
@@ -81,17 +81,17 @@ class Hexagon(Button):
         pygame.draw.polygon(self.getSurface(), (230, 20, 20), redCorners)
         pygame.draw.line(self.getSurface(), (0, 0, 0), (round(centre[0]), round(centre[1]+size*3/10)), (round(centre[0]), round(centre[1]-size/2)), 2)
 
-    def drawBomb(self, surface, centre, size, sqrt3):
+    def drawBomb(self, surface, centre: tuple, size: int, sqrt3: float):
         pygame.draw.circle(surface, 0, centre, round(size/4))
         pygame.draw.line(surface, 0, (round(centre[0]+size*sqrt3/3), round(centre[1]+size/3)), (round(centre[0]-size*sqrt3/3), round(centre[1]-size/3)), round(size/10))
         pygame.draw.line(surface, 0, (round(centre[0]-size*sqrt3/3), round(centre[1]+size/3)), (round(centre[0]+size*sqrt3/3), round(centre[1]-size/3)), round(size/10))
         pygame.draw.line(surface, 0, (centre[0], round(centre[1]+size*2/3)), (centre[0], round(centre[1]-size*2/3)), round(size/10))
 
-    def drawCross(self, surface, centre, size):
+    def drawCross(self, surface, centre: tuple, size: int):
         pygame.draw.line(surface, (240, 110, 110), ((round(centre[0]+size/2)), round(centre[1]+size/2)), ((round(centre[0]-size/2)), round(centre[1]-size/2)), round(size/10))
         pygame.draw.line(surface, (240, 110, 110), ((round(centre[0]-size/2)), round(centre[1]+size/2)), ((round(centre[0]+size/2)), round(centre[1]-size/2)), round(size/10))
 
-    def drawSelf(self, font, borderColour, sqrt3, gameActive):
+    def drawSelf(self, font, borderColour, sqrt3: float, gameActive: bool):
         # To save CPU, calculate sqrt3 once and send to all things
         # Classic computing problem, where space and speed can be traded. I chose speed over space bc I don't trust pygame
         size = self.getSize()

@@ -12,7 +12,7 @@ from random import randint
 #           /5\_/3\                    [" ", "4", " "]]
 #           \_/4\_/
 #             \_/
-def createHexArray(size, mainSurface, hexSize, arrayCentre = (640, 360), colour = (128, 128, 128), randomColour = False):
+def createHexArray(size: int, mainSurface, hexSize: int, arrayCentre: tuple = (640, 360), colour:tuple = (128, 128, 128), randomColour: bool = False):
     grid = [["" for i in range(size*2+1)] for j in range(size*4+1)]
     for i in range(size):
         # Before recursively adding hexes, add the first one

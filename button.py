@@ -1,6 +1,6 @@
 import pygame
 class Button():
-    def __init__(self, centre, width, height, isCircle, surface, colour, text, font, autoSize = False, clickFunction = None):
+    def __init__(self, centre:tuple , width: int, height: int, isCircle: bool, surface, colour: tuple, text: str, font, autoSize: bool = False, clickFunction = None):
         self.centre = centre
         if isCircle:
             self.isCircle = True
