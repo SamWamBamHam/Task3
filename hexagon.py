@@ -64,7 +64,7 @@ class Hexagon(Button):
     # When left-clicked for the first time
     def reveal(self):
         self.setRevealed(True)
-        if self.getMineCount() == 0:
+        if self.getMineCount() <= 0:
             return True
         else:
             return False
@@ -85,8 +85,9 @@ class Hexagon(Button):
         # To save CPU, calculate sqrt3 once and send to all things
         # Classic computing problem, where space and speed can be traded. I chose speed over space bc I don't trust pygame
         size = self.getSize()
-        x = self.getCentre()[0]-size/2
-        y = self.getCentre()[1]-size*sqrt3/2
+        centre = self.getCentre()
+        x = centre[0]-size/2
+        y = centre[1]-size*sqrt3/2
         # Kinda just trace the hexagon, then save those points
         corners = []
         x += size
@@ -124,8 +125,10 @@ class Hexagon(Button):
                 # Different colours per number so that a glance tells you the number, rather than a read
                 match text:
                     case "-1":
-                        textSurface = font.render(text, True, 0)
-                        # CHANGE TEMP DO SOMETHING
+                        pygame.draw.circle(surface, 0, centre, round(size/4))
+                        pygame.draw.line(surface, 0, (centre[0]+size*sqrt3/2, centre[1]+size/2), (centre[0]-size*sqrt3/2, centre[1]-size/2))
+                        pygame.draw.line(surface, 0, (centre[0]-size*sqrt3/2, centre[1]+size/2), (centre[0]+size*sqrt3/2, centre[1]-size/2))
+                        pygame.draw.line(surface, 0, (centre[0], centre[1]+size), (centre[0], centre[1]-size))
                     case "0":
                         pass
                     case "1":
@@ -140,9 +143,8 @@ class Hexagon(Button):
                         textSurface = font.render(text, True, (230, 20, 20))
                     case "6":
                         textSurface = font.render(text, True, (200, 30, 200))
-                if int(text) != 0:
+                if int(text) > 0:
                     sizeOf = font.size(text)
-                    centre = self.getCentre()
                     # Rendering text makes its own image 'Surface', which must be added, or 'blit'ed to the main surface
                     self.getSurface().blit(textSurface, (centre[0]-sizeOf[0]/2, centre[1]-sizeOf[1]/2))
         elif self.getFlagged():

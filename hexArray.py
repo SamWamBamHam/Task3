@@ -109,6 +109,7 @@ def collectHexReferences(grid):
     return hexes
 
 def revealTile(grid, coord, minePercentage=0, doSpread = False):
+    returnValue = True
     hexes = collectHexReferences(grid)
     closestHex = grid[coord[1]][coord[0]]
     if isinstance(closestHex, Hexagon):
@@ -145,15 +146,22 @@ def revealTile(grid, coord, minePercentage=0, doSpread = False):
             else:
                 # Its Zero Spread time (common feature), where since a 0 must have all non-mine tiles around it, they are revealed.
                 # Makes for some rewarding moments as a chunk of the grid is revealed
-                isZero = closestHex.reveal()
+                isSpecial = closestHex.reveal()
                 # When revealing a tile, it returns with true if you should keep revealing. Only triggered when zero
-                if isZero:
-                    revealTile(grid, (coord[0]+1, coord[1]+1))
-                    revealTile(grid, (coord[0]+1, coord[1]-1))
-                    revealTile(grid, (coord[0]-1, coord[1]+1))
-                    revealTile(grid, (coord[0]-1, coord[1]-1))
-                    revealTile(grid, (coord[0], coord[1]+2))
-                    revealTile(grid, (coord[0], coord[1]-2))
+                if isSpecial:
+                    if closestHex.getMine():
+                        for hex in collectHexReferences(grid):
+                            if hex.getMine():
+                                hex.reveal()
+                                returnValue = False
+                    else:
+                        revealTile(grid, (coord[0]+1, coord[1]+1))
+                        revealTile(grid, (coord[0]+1, coord[1]-1))
+                        revealTile(grid, (coord[0]-1, coord[1]+1))
+                        revealTile(grid, (coord[0]-1, coord[1]-1))
+                        revealTile(grid, (coord[0], coord[1]+2))
+                        revealTile(grid, (coord[0], coord[1]-2))
+    return returnValue
 
 # Might be fun to have an essential game mechanic
 def flagTile(grid, coord):

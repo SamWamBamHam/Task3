@@ -18,6 +18,7 @@ bigFont = pygame.font.Font(size = 60)
 buttonList = []
 hexGrid = None
 escCounter = 0
+gameActive = False
 
 def goToHex():
     global firstFrame
@@ -87,10 +88,12 @@ while running == True:
                 closestButton = findClosestButton(buttonList, position)
                 if closestButton != False:
                     if isinstance(closestButton, Hexagon):
-                        if rightClick:
-                            flagTile(hexGrid, closestButton.getCoords())
-                        elif leftClick:
-                            revealTile(hexGrid, closestButton.getCoords(), 30, True)
+                        if gameActive:
+                            if rightClick:
+                                flagTile(hexGrid, closestButton.getCoords())
+                            elif leftClick:
+                                gameActive = revealTile(hexGrid, closestButton.getCoords(), 30, True)
+
                     else:
                         function = closestButton.getClickFunction()
                         if function:
@@ -108,6 +111,7 @@ while running == True:
                 buttonList.append(Button((640, 440), 100, 60, False, mainSurface, (112, 142, 160), "Go to hex", regFont, False, goToHex))
                 buttonList.append(Button((1200, 80), 100, 100, False, mainSurface, (200, 170, 117), "Quit (Hold Esc)", regFont, True, quit))
             case "hex":
+                gameActive = True
                 pixelSize = 30
                 hexFont = pygame.font.Font(size=pixelSize)
                 hexGrid = createHexArray(gameSize, mainSurface, pixelSize)
