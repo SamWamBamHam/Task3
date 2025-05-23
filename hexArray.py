@@ -109,7 +109,7 @@ def collectHexReferences(grid):
     return hexes
 
 def revealTile(grid, coord, minePercentage=0, doSpread = False):
-    returnValue = True
+    returnValue = None
     hexes = collectHexReferences(grid)
     closestHex = grid[coord[1]][coord[0]]
     if isinstance(closestHex, Hexagon):
@@ -156,7 +156,7 @@ def revealTile(grid, coord, minePercentage=0, doSpread = False):
                         for hex in collectHexReferences(grid):
                             if hex.getMine():
                                 hex.reveal()
-                                returnValue = False
+                                returnValue = "Failure"
                     else:
                         revealTile(grid, (coord[0]+1, coord[1]+1))
                         revealTile(grid, (coord[0]+1, coord[1]-1))
@@ -164,6 +164,15 @@ def revealTile(grid, coord, minePercentage=0, doSpread = False):
                         revealTile(grid, (coord[0]-1, coord[1]-1))
                         revealTile(grid, (coord[0], coord[1]+2))
                         revealTile(grid, (coord[0], coord[1]-2))
+    #Check if the game has been won
+    win = True
+    for hex in collectHexReferences(grid):
+        if hex.getMine() and hex.getRevealed():
+            win = False
+        elif not (hex.getMine() or hex.getRevealed()):
+            win = False
+    if win:
+        returnValue = "Win"
     return returnValue
 
 # Might be fun to have an essential game mechanic

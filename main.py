@@ -18,7 +18,7 @@ bigFont = pygame.font.Font(size = 60)
 buttonList = []
 hexGrid = None
 escCounter = 0
-gameActive = False
+gameState = None
 
 def goToHex():
     global firstFrame
@@ -88,12 +88,11 @@ while running == True:
                 closestButton = findClosestButton(buttonList, position)
                 if closestButton != False:
                     if isinstance(closestButton, Hexagon):
-                        if gameActive:
+                        if gameState == None:
                             if rightClick:
                                 flagTile(hexGrid, closestButton.getCoords())
                             elif leftClick:
-                                gameActive = revealTile(hexGrid, closestButton.getCoords(), 30, True)
-
+                                gameState = revealTile(hexGrid, closestButton.getCoords(), 30, True)
                     else:
                         function = closestButton.getClickFunction()
                         if function:
@@ -111,7 +110,7 @@ while running == True:
                 buttonList.append(Button((640, 440), 100, 60, False, mainSurface, (112, 142, 160), "Go to hex", regFont, False, goToHex))
                 buttonList.append(Button((1200, 80), 100, 100, False, mainSurface, (200, 170, 117), "Quit (Hold Esc)", regFont, True, quit))
             case "hex":
-                gameActive = True
+                gameState = None
                 pixelSize = 30
                 hexFont = pygame.font.Font(size=pixelSize)
                 hexGrid = createHexArray(gameSize, mainSurface, pixelSize)
@@ -131,11 +130,19 @@ while running == True:
             for button in buttonList:
                 if not isinstance(button, Hexagon):
                     button.drawSelf()
-            unflaggedText = f"Mines: {countUnflagged(hexGrid)}"
-            if unflaggedText != "Mines: 0":
-                unflaggedTextSurface = bigFont.render(unflaggedText, False, 0)
-                mainSurface.blit(unflaggedTextSurface, (50, 50))
-            drawHexArray(hexGrid, hexFont, gameActive)
+            match gameState:
+                case None:
+                    unflaggedText = f"Mines: {countUnflagged(hexGrid)}"
+                    if unflaggedText != "Mines: 0":
+                        unflaggedTextSurface = bigFont.render(unflaggedText, False, 0)
+                        mainSurface.blit(unflaggedTextSurface, (50, 50))
+                case "Win":
+                    winTextSurface = bigFont.render("You Win!", False, (50, 180, 50))
+                    mainSurface.blit(winTextSurface, (50, 50))
+                case "Failure":
+                    failureTextSurface = bigFont.render("You Lost...", False, (180, 50, 50))
+                    mainSurface.blit(failureTextSurface, (50, 50))
+            drawHexArray(hexGrid, hexFont, gameState == None)
 
     #Render End Here
 
