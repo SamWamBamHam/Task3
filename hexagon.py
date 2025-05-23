@@ -126,9 +126,9 @@ class Hexagon(Button):
                 match text:
                     case "-1":
                         pygame.draw.circle(surface, 0, centre, round(size/4))
-                        pygame.draw.line(surface, 0, (centre[0]+size*sqrt3/2, centre[1]+size/2), (centre[0]-size*sqrt3/2, centre[1]-size/2))
-                        pygame.draw.line(surface, 0, (centre[0]-size*sqrt3/2, centre[1]+size/2), (centre[0]+size*sqrt3/2, centre[1]-size/2))
-                        pygame.draw.line(surface, 0, (centre[0], centre[1]+size), (centre[0], centre[1]-size))
+                        pygame.draw.line(surface, 0, (round(centre[0]+size*sqrt3/3), round(centre[1]+size/3)), (round(centre[0]-size*sqrt3/3), round(centre[1]-size/3)))
+                        pygame.draw.line(surface, 0, (round(centre[0]-size*sqrt3/3), round(centre[1]+size/3)), (round(centre[0]+size*sqrt3/3), round(centre[1]-size/3)))
+                        pygame.draw.line(surface, 0, (centre[0], round(centre[1]+size*3/2)), (centre[0], round(centre[1]-size*3/2)))
                     case "0":
                         pass
                     case "1":
