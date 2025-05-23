@@ -111,41 +111,40 @@ class Hexagon(Button):
             corners.pop(i)
             corners.insert(i, (round(x), round(y)))
         surface = self.getSurface()
-        if self.getRevealed():
-            pygame.draw.polygon(surface, self.getRevealedColour(), corners, 0)
-        else:
+        if not self.getRevealed() or (self.getRevealed() and self.getMine() and not self.getFlagged()):
             pygame.draw.polygon(surface, self.getColour(), corners, 0)
+        else:
+            pygame.draw.polygon(surface, self.getRevealedColour(), corners, 0)
         # Border last so that its on top
         pygame.draw.polygon(surface, borderColour, corners, int(size/10))
-        if self.getRevealed():
-            if not self.getFlagged():
-                text = str(self.getMineCount())
-                assert isinstance(font, pygame.font.Font)
-                # Testing out some new syntax. Its pretty sweet
-                # Different colours per number so that a glance tells you the number, rather than a read
-                match text:
-                    case "-1":
-                        pygame.draw.circle(surface, 0, centre, round(size/4))
-                        pygame.draw.line(surface, 0, (round(centre[0]+size*sqrt3/3), round(centre[1]+size/3)), (round(centre[0]-size*sqrt3/3), round(centre[1]-size/3)))
-                        pygame.draw.line(surface, 0, (round(centre[0]-size*sqrt3/3), round(centre[1]+size/3)), (round(centre[0]+size*sqrt3/3), round(centre[1]-size/3)))
-                        pygame.draw.line(surface, 0, (centre[0], round(centre[1]+size*3/2)), (centre[0], round(centre[1]-size*3/2)))
-                    case "0":
-                        pass
-                    case "1":
-                        textSurface = font.render(text, True, (20, 20, 250))
-                    case "2":
-                        textSurface = font.render(text, True, (20, 180, 50))
-                    case "3":
-                        textSurface = font.render(text, True, (200, 200, 20))
-                    case "4":
-                        textSurface = font.render(text, True, (240, 100, 20))
-                    case "5":
-                        textSurface = font.render(text, True, (230, 20, 20))
-                    case "6":
-                        textSurface = font.render(text, True, (200, 30, 200))
-                if int(text) > 0:
-                    sizeOf = font.size(text)
-                    # Rendering text makes its own image 'Surface', which must be added, or 'blit'ed to the main surface
-                    self.getSurface().blit(textSurface, (centre[0]-sizeOf[0]/2, centre[1]-sizeOf[1]/2))
+        if self.getRevealed() and not self.getFlagged():
+            text = str(self.getMineCount())
+            assert isinstance(font, pygame.font.Font)
+            # Testing out some new syntax. Its pretty sweet
+            # Different colours per number so that a glance tells you the number, rather than a read
+            match text:
+                case "-1":
+                    pygame.draw.circle(surface, 0, centre, round(size/4))
+                    pygame.draw.line(surface, 0, (round(centre[0]+size*sqrt3/3), round(centre[1]+size/3)), (round(centre[0]-size*sqrt3/3), round(centre[1]-size/3)))
+                    pygame.draw.line(surface, 0, (round(centre[0]-size*sqrt3/3), round(centre[1]+size/3)), (round(centre[0]+size*sqrt3/3), round(centre[1]-size/3)))
+                    pygame.draw.line(surface, 0, (centre[0], round(centre[1]+size*2/3)), (centre[0], round(centre[1]-size*2/3)))
+                case "0":
+                    pass
+                case "1":
+                    textSurface = font.render(text, True, (20, 20, 250))
+                case "2":
+                    textSurface = font.render(text, True, (20, 180, 50))
+                case "3":
+                    textSurface = font.render(text, True, (200, 200, 20))
+                case "4":
+                    textSurface = font.render(text, True, (240, 100, 20))
+                case "5":
+                    textSurface = font.render(text, True, (230, 20, 20))
+                case "6":
+                    textSurface = font.render(text, True, (200, 30, 200))
+            if int(text) > 0:
+                sizeOf = font.size(text)
+                # Rendering text makes its own image 'Surface', which must be added, or 'blit'ed to the main surface
+                self.getSurface().blit(textSurface, (centre[0]-sizeOf[0]/2, centre[1]-sizeOf[1]/2))
         elif self.getFlagged():
             self.drawFlag(sqrt3)
