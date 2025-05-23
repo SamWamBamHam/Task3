@@ -135,7 +135,7 @@ while running == True:
             if unflaggedText != "Mines: 0":
                 unflaggedTextSurface = bigFont.render(unflaggedText, False, 0)
                 mainSurface.blit(unflaggedTextSurface, (50, 50))
-            drawHexArray(hexGrid, hexFont)
+            drawHexArray(hexGrid, hexFont, gameActive)
 
     #Render End Here
 

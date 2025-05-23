@@ -81,7 +81,17 @@ class Hexagon(Button):
         pygame.draw.polygon(self.getSurface(), (230, 20, 20), redCorners)
         pygame.draw.line(self.getSurface(), (0, 0, 0), (round(centre[0]), round(centre[1]+size*3/10)), (round(centre[0]), round(centre[1]-size/2)), 2)
 
-    def drawSelf(self, font, borderColour, sqrt3):
+    def drawBomb(self, surface, centre, size, sqrt3):
+        pygame.draw.circle(surface, 0, centre, round(size/4))
+        pygame.draw.line(surface, 0, (round(centre[0]+size*sqrt3/3), round(centre[1]+size/3)), (round(centre[0]-size*sqrt3/3), round(centre[1]-size/3)), round(size/10))
+        pygame.draw.line(surface, 0, (round(centre[0]-size*sqrt3/3), round(centre[1]+size/3)), (round(centre[0]+size*sqrt3/3), round(centre[1]-size/3)), round(size/10))
+        pygame.draw.line(surface, 0, (centre[0], round(centre[1]+size*2/3)), (centre[0], round(centre[1]-size*2/3)), round(size/10))
+
+    def drawCross(self, surface, centre, size):
+        pygame.draw.line(surface, (240, 110, 110), ((round(centre[0]+size/2)), round(centre[1]+size/2)), ((round(centre[0]-size/2)), round(centre[1]-size/2)), round(size/10))
+        pygame.draw.line(surface, (240, 110, 110), ((round(centre[0]-size/2)), round(centre[1]+size/2)), ((round(centre[0]+size/2)), round(centre[1]-size/2)), round(size/10))
+
+    def drawSelf(self, font, borderColour, sqrt3, gameActive):
         # To save CPU, calculate sqrt3 once and send to all things
         # Classic computing problem, where space and speed can be traded. I chose speed over space bc I don't trust pygame
         size = self.getSize()
@@ -111,7 +121,7 @@ class Hexagon(Button):
             corners.pop(i)
             corners.insert(i, (round(x), round(y)))
         surface = self.getSurface()
-        if not self.getRevealed() or (self.getRevealed() and self.getMine() and not self.getFlagged()):
+        if not self.getRevealed() or (not gameActive and self.getMine() and not self.getFlagged()) or self.getFlagged():
             pygame.draw.polygon(surface, self.getColour(), corners, 0)
         else:
             pygame.draw.polygon(surface, self.getRevealedColour(), corners, 0)
@@ -124,10 +134,7 @@ class Hexagon(Button):
             # Different colours per number so that a glance tells you the number, rather than a read
             match text:
                 case "-1":
-                    pygame.draw.circle(surface, 0, centre, round(size/4))
-                    pygame.draw.line(surface, 0, (round(centre[0]+size*sqrt3/3), round(centre[1]+size/3)), (round(centre[0]-size*sqrt3/3), round(centre[1]-size/3)))
-                    pygame.draw.line(surface, 0, (round(centre[0]-size*sqrt3/3), round(centre[1]+size/3)), (round(centre[0]+size*sqrt3/3), round(centre[1]-size/3)))
-                    pygame.draw.line(surface, 0, (centre[0], round(centre[1]+size*2/3)), (centre[0], round(centre[1]-size*2/3)))
+                    self.drawBomb(surface, centre, size, sqrt3)
                 case "0":
                     pass
                 case "1":
@@ -147,4 +154,7 @@ class Hexagon(Button):
                 # Rendering text makes its own image 'Surface', which must be added, or 'blit'ed to the main surface
                 self.getSurface().blit(textSurface, (centre[0]-sizeOf[0]/2, centre[1]-sizeOf[1]/2))
         elif self.getFlagged():
-            self.drawFlag(sqrt3)
+            if gameActive or self.getMine():
+                self.drawFlag(sqrt3)
+            else:
+                self.drawCross(surface, centre, size)

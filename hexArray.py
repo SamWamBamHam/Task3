@@ -40,7 +40,7 @@ def createHexArray(size, mainSurface, hexSize, arrayCentre = (640, 360), colour 
                 grid[y].insert(x, Hexagon(mainSurface, hexSize, newCentre, colour, newHexCoord))
     return grid
 
-def drawHexArray(grid, font, borderColour=(0, 0, 0), centreOnly = False):
+def drawHexArray(grid, font, gameActive, borderColour=(0, 0, 0), centreOnly = False):
     # Send the square root of 3 so that each hexagon does not have to make that costly calculation
     sqrt3 = sqrt(3)
     for row in grid:
@@ -49,7 +49,7 @@ def drawHexArray(grid, font, borderColour=(0, 0, 0), centreOnly = False):
                 if centreOnly:
                     cell.drawCentre(borderColour)
                 else:
-                    cell.drawSelf(font, borderColour, sqrt3)    
+                    cell.drawSelf(font, borderColour, sqrt3, gameActive)    
                     # Each hexagon draws itself, but their positions are exact so they line up
                     # This does mean that every line is drawn twice, but what can you do
 
@@ -120,7 +120,10 @@ def revealTile(grid, coord, minePercentage=0, doSpread = False):
         if firstClick:
             # After the first click we distribute mines. Therefore the first click is always safe.
             # Common feature in minesweeper, known as Safe Start
-            safeSquareCoords = (coord, (coord[0]+1, coord[1]+1), (coord[0]+1, coord[1]-1), (coord[0]-1, coord[1]+1), (coord[0]-1, coord[1]-1), (coord[0], coord[1]+2), (coord[0], coord[1]-2))
+            safeSquareCoords = [coord, (coord[0]+1, coord[1]+1), (coord[0]+1, coord[1]-1), (coord[0]-1, coord[1]+1), (coord[0]-1, coord[1]-1), (coord[0], coord[1]+2), (coord[0], coord[1]-2)]
+            for sSCoord in safeSquareCoords:
+                if not isinstance(grid[sSCoord[1]][sSCoord[0]], Hexagon):
+                    safeSquareCoords.remove(sSCoord)
             distributeMines(grid, minePercentage, safeSquareCoords)
         if not closestHex.getFlagged():
             if closestHex.getRevealed():
