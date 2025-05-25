@@ -1,13 +1,13 @@
 import pygame
 from button import Button
 class Hexagon(Button):
-    def __init__(self, surface, size: int, centre: tuple, colour: tuple, coords: tuple):
+    def __init__(self, surface, size: int, centre: tuple, revealedColour: tuple, coords: tuple):
         self.surface = surface
         self.centre = centre
         self.size = size
-        self.colour = colour
+        self.colour = (int(revealedColour[0]*0.8), int(revealedColour[1]*0.8), int(revealedColour[2]*0.8))
         # Is darker
-        self.revealedColour = (int(colour[0]*0.8), int(colour[1]*0.8), int(colour[2]*0.8))
+        self.revealedColour = revealedColour
         self.mine = False
         self.revealed = False
         self.mineCount = -1

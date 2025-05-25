@@ -61,6 +61,7 @@ while running == True:
                 holdingEsc = False
 
         elif event.type == pygame.MOUSEBUTTONDOWN:
+            position = (event.pos[0], event.pos[1])
             if event.button == 3 or (event.button == 1 and holdingLCtrl):
                 rightClick = True
             elif event.button == 1:
@@ -84,7 +85,6 @@ while running == True:
         case "hex":
             # When in the game, m1 reveals, ctrl + m1 flags, m2 flags and R starts a new game
             if leftClick or rightClick:
-                position = event.pos
                 closestButton = findClosestButton(buttonList, position)
                 if closestButton != False:
                     if isinstance(closestButton, Hexagon):
