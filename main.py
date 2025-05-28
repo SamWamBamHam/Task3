@@ -40,7 +40,7 @@ while running == True:
 
     # Inputs work by figuring out everything that happened this frame, then resolving them dependent
     # on which menu your are currently in
-    leftClick, rightClick, rClick = False, False, False
+    leftClick, rightClick, rClick, escClick = False, False, False, False
     for event in pygame.event.get():
         if event.type == pygame.QUIT:    
             quit()
@@ -53,6 +53,7 @@ while running == True:
                 rClick = True
             elif event.key == pygame.K_ESCAPE:
                 holdingEsc = True
+                escClick = True
 
         elif event.type == pygame.KEYUP:
             if event.key == pygame.K_LCTRL:
@@ -99,6 +100,8 @@ while running == True:
                             function()
             if rClick:
                 goToHex()
+            if escClick:
+                goToMain()
     
     mainSurface.fill("purple")
 
