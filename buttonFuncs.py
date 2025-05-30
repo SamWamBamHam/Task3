@@ -30,3 +30,9 @@ def findClosestButton(buttonList: list, pos:tuple):
                 return False
     else:
         return False
+    
+def findIndexOfButtonByFunction(buttonList: list, function):
+    for button in buttonList:
+        if button.getClickFunction() == function:
+            return button
+    return False

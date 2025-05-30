@@ -2,17 +2,19 @@ import pygame
 from hexArray import createHexArray, drawHexArray, revealTile, flagTile, countUnflagged
 from hexagon import Hexagon
 from button import Button
-from buttonFuncs import findClosestButton
+from buttonFuncs import findClosestButton, findIndexOfButtonByFunction
 from dbFuncs import getAll, login, signUp
 
 pygame.init()
 mainSurface = pygame.display.set_mode((1280, 720))
 clock = pygame.time.Clock()
 running = True
-menu = "main"
+menu = "login"
 firstFrame = True
 holdingLCtrl = False
 holdingEsc = False
+holdingBackspace = False
+backspaceFrames = 0
 gameSize = 7
 regFont = pygame.font.Font(size = 30)
 bigFont = pygame.font.Font(size = 60)
@@ -20,34 +22,74 @@ buttonList = []
 hexGrid = None
 escCounter = 0
 gameState = None
+focusedTextbox = None
+typedText = ""
+usernameText = ""
+passwordText = ""
+usernameButtonPos = (570, 360)
+passwordButtonPos = (570, 460)
+bannedCharacters = ["'", '"']
+loginLeftMargin = usernameButtonPos[0]-50
 
 def goToHex():
-    global firstFrame
+    global firstFrame, menu
     firstFrame = True
-    global menu
     menu = "hex"
 
 def goToMain():
-    global firstFrame
+    global firstFrame, menu
     firstFrame = True
-    global menu
     menu = "main"
 
 def goToStats():
-    global firstFrame
+    global firstFrame, menu
     firstFrame = True
-    global menu
     menu = "stats"
 
 def quit():
     global running
     running = False
 
+def unfocus():
+    global focusedTextbox, typedText, usernameText, passwordText
+    focusedTextbox = None
+    typedText = ""
+    pygame.key.stop_text_input()
+    if passwordText == "":
+        button = findIndexOfButtonByFunction(buttonList, focusPassword)
+        buttonList.remove(button)
+        buttonList.append(Button(passwordButtonPos, 100, 60, False, mainSurface, (150, 180, 210), "Password", regFont, True, focusPassword))
+    if usernameText == "":
+        button = findIndexOfButtonByFunction(buttonList, focusUsername)
+        buttonList.remove(button)
+        buttonList.append(Button(usernameButtonPos, 100, 60, False, mainSurface, (150, 180, 210), "Username", regFont, True, focusUsername))
+
+def focusUsername():
+    unfocus()
+    global focusedTextbox, usernameText, typedText, buttonList
+    focusedTextbox = "username"
+    typedText = usernameText
+    pygame.key.start_text_input()
+    button = findIndexOfButtonByFunction(buttonList, focusUsername)
+    buttonList.remove(button)
+    buttonList.append(Button(usernameButtonPos, 100, 60, False, mainSurface, (150, 180, 210), typedText, regFont, True, focusUsername))
+
+def focusPassword():
+    unfocus()
+    global focusedTextbox, typedText, passwordText, buttonList
+    focusedTextbox = "password"
+    typedText = passwordText
+    pygame.key.start_text_input()
+    button = findIndexOfButtonByFunction(buttonList, focusPassword)
+    buttonList.remove(button)
+    buttonList.append(Button(passwordButtonPos, 100, 60, False, mainSurface, (150, 180, 210), typedText, regFont, True, focusPassword))
+
 while running == True:
 
     # Inputs work by figuring out everything that happened this frame, then resolving them dependent
     # on which menu your are currently in
     leftClick, rightClick, rClick, escClick = False, False, False, False
+    typedButton = None
     for event in pygame.event.get():
         if event.type == pygame.QUIT:    
             quit()
@@ -61,12 +103,17 @@ while running == True:
             elif event.key == pygame.K_ESCAPE:
                 holdingEsc = True
                 escClick = True
+            elif event.key == pygame.K_BACKSPACE:
+                holdingBackspace = True
 
         elif event.type == pygame.KEYUP:
             if event.key == pygame.K_LCTRL:
                 holdingLCtrl = False
             elif event.key == pygame.K_ESCAPE:
                 holdingEsc = False
+            elif event.key == pygame.K_BACKSPACE:
+                holdingBackspace = False
+                backspaceFrames = 0
 
         elif event.type == pygame.MOUSEBUTTONDOWN:
             position = (event.pos[0], event.pos[1])
@@ -75,17 +122,22 @@ while running == True:
             elif event.button == 1:
                 leftClick = True
 
+        elif event.type == pygame.TEXTINPUT:
+            typedButton = event.text
+            if typedButton in bannedCharacters:
+                typedButton = None
+
     match menu:
         case "main":
             if leftClick:
-                closestButton = findClosestButton(buttonList, event.pos)
+                closestButton = findClosestButton(buttonList, position)
                 if closestButton != False:
                     function = closestButton.getClickFunction()
                     if function:
                         function()
             if holdingEsc:
                 escCounter += 1
-                if escCounter == 120:
+                if escCounter == 90:
                     quit()
             else:
                 escCounter = 0
@@ -109,11 +161,44 @@ while running == True:
                 goToHex()
             if escClick:
                 goToMain()
-    
+        
+        case "login":
+            if leftClick:
+                closestButton = findClosestButton(buttonList, position)
+                if closestButton:
+                    if closestButton.getClickFunction() == focusUsername:
+                        focusUsername()
+                    elif closestButton.getClickFunction() == focusPassword:
+                        focusPassword()
+                    else:
+                        unfocus()
+                else:
+                    unfocus()
+            oldTypedText = typedText
+            if holdingBackspace:
+                backspaceFrames += 1
+                if typedText != "" and (backspaceFrames == 1 or (backspaceFrames > 30 and backspaceFrames%5 ==1)):
+                    typedText = typedText[0:-1]
+            if typedButton != None:
+                typedText += typedButton
+            if oldTypedText != typedText:
+                if focusedTextbox == "username":
+                    usernameText = typedText
+                    button = findIndexOfButtonByFunction(buttonList, focusUsername)
+                    buttonList.remove(button)
+                    buttonList.append(Button(usernameButtonPos, 100, 60, False, mainSurface, (150, 180, 210), typedText, regFont, True, focusUsername))
+                elif focusedTextbox == "password":
+                    passwordText = typedText
+                    button = findIndexOfButtonByFunction(buttonList, focusPassword)
+                    buttonList.remove(button)
+                    buttonList.append(Button(passwordButtonPos, 100, 60, False, mainSurface, (150, 180, 210), typedText, regFont, True, focusPassword))
+
     mainSurface.fill("purple")
 
     #Render Start Here
     if firstFrame:
+        textToggle = False
+        pygame.key.stop_text_input()
         buttonList = []
         match menu:
             case "main":
@@ -133,6 +218,9 @@ while running == True:
                 buttonList.append(Button((1140, 170), 140, 60, False, mainSurface, (160, 200, 180), "Back to Menu", regFont, False, goToMain))
             case "stats":
                 pass
+            case "login":
+                buttonList.append(Button(usernameButtonPos, 100, 60, False, mainSurface, (150, 180, 210), "Username", regFont, True, focusUsername))
+                buttonList.append(Button(passwordButtonPos, 100, 60, False, mainSurface, (150, 180, 210), "Password", regFont, True, focusPassword))
         firstFrame = False
     match menu:
         case "main":
@@ -158,6 +246,17 @@ while running == True:
             drawHexArray(hexGrid, hexFont, gameState == None)
         case "stats":
             pass
+        case "login":
+            for button in buttonList:
+                if button.getClickFunction() in (focusPassword, focusUsername):
+                    button.drawSelf(loginLeftMargin)
+                else:
+                    button.drawSelf()
+                size = regFont.size("Username: ")
+                textRender = regFont.render("Username: ", False, 0)
+                mainSurface.blit(textRender, (loginLeftMargin-10-size[0], usernameButtonPos[1]-size[1]/2))
+                textRender = regFont.render("Password: ", False, 0)
+                mainSurface.blit(textRender, (loginLeftMargin-10-size[0], passwordButtonPos[1]-size[1]/2))
 
     #Render End Here
 

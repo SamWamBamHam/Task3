@@ -49,7 +49,7 @@ class Button():
     def getHeight(self):
         return self.height
     
-    def drawSelf(self):
+    def drawSelf(self, leftMargin = False):
         centre = self.getCentre()
         if self.getIsCircle():
             pygame.draw.circle(self.getSurface(), self.getColour(), centre, self.getClickRadius())
@@ -57,12 +57,18 @@ class Button():
         else:
             width = self.getWidth()
             height = self.getHeight()
-            corners = ((centre[0]+width/2, centre[1]+height/2), (centre[0]+width/2, centre[1]-height/2), (centre[0]-width/2, centre[1]-height/2), (centre[0]-width/2, centre[1]+height/2))
+            if leftMargin != False:
+                corners = ((leftMargin+width, centre[1]+height/2), (leftMargin+width, centre[1]-height/2), (leftMargin, centre[1]-height/2), (leftMargin, centre[1]+height/2))
+            else:
+                corners = ((centre[0]+width/2, centre[1]+height/2), (centre[0]+width/2, centre[1]-height/2), (centre[0]-width/2, centre[1]-height/2), (centre[0]-width/2, centre[1]+height/2))
             pygame.draw.polygon(self.getSurface(), self.getColour(), corners)
-            pygame.draw.polygon(self.getSurface(), 0, corners, round((width+height)/35))
+            pygame.draw.polygon(self.getSurface(), 0, corners, round((height)/7))
         font = self.getFont()
         text = self.getText()
         assert isinstance(font, pygame.font.Font)
         textSurface = font.render(text, False, 0)
         sizeOf = font.size(text)
-        self.getSurface().blit(textSurface, (centre[0]-sizeOf[0]/2, centre[1]-sizeOf[1]/2))
+        if leftMargin != False:
+            self.getSurface().blit(textSurface, (leftMargin+10, centre[1]-sizeOf[1]/2))
+        else:
+            self.getSurface().blit(textSurface, (centre[0]-sizeOf[0]/2, centre[1]-sizeOf[1]/2))
