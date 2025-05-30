@@ -3,7 +3,7 @@ from hexArray import createHexArray, drawHexArray, revealTile, flagTile, countUn
 from hexagon import Hexagon
 from button import Button
 from buttonFuncs import findClosestButton
-from dbFuncs import getAll, login
+from dbFuncs import getAll, login, signUp
 
 pygame.init()
 mainSurface = pygame.display.set_mode((1280, 720))
@@ -132,7 +132,7 @@ while running == True:
                 buttonList.append(Button((1140, 80), 140, 60, False, mainSurface, (160, 200, 180), "Restart (R)", regFont, False, goToHex))
                 buttonList.append(Button((1140, 170), 140, 60, False, mainSurface, (160, 200, 180), "Back to Menu", regFont, False, goToMain))
             case "stats":
-                print(getAll("Me"))
+                pass
         firstFrame = False
     match menu:
         case "main":
