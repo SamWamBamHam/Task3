@@ -1,6 +1,4 @@
-from button import Button
-
-# With this class I can have many, many buttons on one screen. Maybe even too many
+# With this file I can handle many, many buttons on one screen. Maybe even too many
 def findClosestButton(buttonList: list, pos:tuple):
     closestButton = None
     # The highest distance possible is 1280^2+720^2 which pales in comparison to integer limit (I hope)

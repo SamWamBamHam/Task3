@@ -3,6 +3,7 @@ from hexArray import createHexArray, drawHexArray, revealTile, flagTile, countUn
 from hexagon import Hexagon
 from button import Button
 from buttonFuncs import findClosestButton
+from dbFuncs import getAll, login
 
 pygame.init()
 mainSurface = pygame.display.set_mode((1280, 720))
@@ -31,6 +32,12 @@ def goToMain():
     firstFrame = True
     global menu
     menu = "main"
+
+def goToStats():
+    global firstFrame
+    firstFrame = True
+    global menu
+    menu = "stats"
 
 def quit():
     global running
@@ -112,6 +119,7 @@ while running == True:
             case "main":
                 buttonList.append(Button((640, 440), 100, 60, False, mainSurface, (112, 142, 160), "Go to hex", regFont, False, goToHex))
                 buttonList.append(Button((1200, 80), 100, 100, False, mainSurface, (200, 170, 117), "Quit (Hold Esc)", regFont, True, quit))
+                buttonList.append(Button((640, 640), 100, 60, False, mainSurface, (112, 142, 160), "Go to Stats", regFont, False, goToStats))
             case "hex":
                 gameState = None
                 pixelSize = 30
@@ -123,6 +131,8 @@ while running == True:
                             buttonList.append(cell)
                 buttonList.append(Button((1140, 80), 140, 60, False, mainSurface, (160, 200, 180), "Restart (R)", regFont, False, goToHex))
                 buttonList.append(Button((1140, 170), 140, 60, False, mainSurface, (160, 200, 180), "Back to Menu", regFont, False, goToMain))
+            case "stats":
+                print(getAll("Me"))
         firstFrame = False
     match menu:
         case "main":
@@ -146,6 +156,8 @@ while running == True:
                     failureTextSurface = bigFont.render("You Lost...", False, (180, 50, 50))
                     mainSurface.blit(failureTextSurface, (50, 50))
             drawHexArray(hexGrid, hexFont, gameState == None)
+        case "stats":
+            pass
 
     #Render End Here
 
