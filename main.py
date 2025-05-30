@@ -30,6 +30,7 @@ usernameButtonPos = (570, 360)
 passwordButtonPos = (570, 460)
 bannedCharacters = ["'", '"']
 loginLeftMargin = usernameButtonPos[0]-50
+loginAlertText = ""
 
 def goToHex():
     global firstFrame, menu
@@ -180,7 +181,12 @@ while running == True:
                 if typedText != "" and (backspaceFrames == 1 or (backspaceFrames > 30 and backspaceFrames%5 ==1)):
                     typedText = typedText[0:-1]
             if typedButton != None:
-                typedText += typedButton
+                if len(typedText) < 20:
+                    typedText += typedButton
+            if len(typedText) == 20:
+                loginAlertText = "You have reached the maximum character limit"
+            elif loginAlertText == "You have reached the maximum character limit":
+                loginAlertText = ""
             if oldTypedText != typedText:
                 if focusedTextbox == "username":
                     usernameText = typedText
@@ -252,12 +258,15 @@ while running == True:
                     button.drawSelf(loginLeftMargin)
                 else:
                     button.drawSelf()
-                size = regFont.size("Username: ")
-                textRender = regFont.render("Username: ", False, 0)
-                mainSurface.blit(textRender, (loginLeftMargin-10-size[0], usernameButtonPos[1]-size[1]/2))
-                textRender = regFont.render("Password: ", False, 0)
-                mainSurface.blit(textRender, (loginLeftMargin-10-size[0], passwordButtonPos[1]-size[1]/2))
-
+            size = regFont.size("Username: ")
+            textRender = regFont.render("Username: ", False, 0)
+            mainSurface.blit(textRender, (loginLeftMargin-10-size[0], usernameButtonPos[1]-size[1]/2))
+            textRender = regFont.render("Password: ", False, 0)
+            mainSurface.blit(textRender, (loginLeftMargin-10-size[0], passwordButtonPos[1]-size[1]/2))
+            if loginAlertText != "":
+                size = regFont.size(loginAlertText)
+                textRender = regFont.render(loginAlertText, False, 0)
+                mainSurface.blit(textRender, (640-size[0]/2, 120-size[1]/2))
     #Render End Here
 
     pygame.display.flip()
