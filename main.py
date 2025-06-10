@@ -31,6 +31,9 @@ passwordButtonPos = (570, 460)
 bannedCharacters = ["'", '"']
 loginLeftMargin = usernameButtonPos[0]-50
 loginAlertText = ""
+loginButtonsWidth = 100
+loginColumGap = 20
+username = None
 
 def goToHex():
     global firstFrame, menu
@@ -51,6 +54,24 @@ def quit():
     global running
     running = False
 
+def doSignup():
+    global usernameText, passwordText, username, loginAlertText
+    success = signUp(usernameText, passwordText)
+    if success:
+        username = usernameText
+        goToMain()
+    else:
+        loginAlertText = "Username already exists"
+
+def doLogin():
+    global usernameText, passwordText, username, loginAlertText
+    success = login(usernameText, passwordText)
+    if success:
+        username = usernameText
+        goToMain()
+    else:
+        loginAlertText = "Invalid credentials"
+
 def unfocus():
     global focusedTextbox, typedText, usernameText, passwordText
     focusedTextbox = None
@@ -66,7 +87,6 @@ def unfocus():
         buttonList.append(Button(usernameButtonPos, 100, 60, False, mainSurface, (150, 180, 210), "Username", regFont, True, focusUsername))
 
 def focusUsername():
-    unfocus()
     global focusedTextbox, usernameText, typedText, buttonList
     focusedTextbox = "username"
     typedText = usernameText
@@ -76,7 +96,6 @@ def focusUsername():
     buttonList.append(Button(usernameButtonPos, 100, 60, False, mainSurface, (150, 180, 210), typedText, regFont, True, focusUsername))
 
 def focusPassword():
-    unfocus()
     global focusedTextbox, typedText, passwordText, buttonList
     focusedTextbox = "password"
     typedText = passwordText
@@ -167,12 +186,9 @@ while running == True:
             if leftClick:
                 closestButton = findClosestButton(buttonList, position)
                 if closestButton:
-                    if closestButton.getClickFunction() == focusUsername:
-                        focusUsername()
-                    elif closestButton.getClickFunction() == focusPassword:
-                        focusPassword()
-                    else:
-                        unfocus()
+                    unfocus()
+                    clickFunction = closestButton.getClickFunction()
+                    clickFunction()
                 else:
                     unfocus()
             oldTypedText = typedText
@@ -192,11 +208,13 @@ while running == True:
                     usernameText = typedText
                     button = findIndexOfButtonByFunction(buttonList, focusUsername)
                     buttonList.remove(button)
+                    del button
                     buttonList.append(Button(usernameButtonPos, 100, 60, False, mainSurface, (150, 180, 210), typedText, regFont, True, focusUsername))
                 elif focusedTextbox == "password":
                     passwordText = typedText
                     button = findIndexOfButtonByFunction(buttonList, focusPassword)
                     buttonList.remove(button)
+                    del button
                     buttonList.append(Button(passwordButtonPos, 100, 60, False, mainSurface, (150, 180, 210), typedText, regFont, True, focusPassword))
 
     mainSurface.fill("purple")
@@ -227,6 +245,8 @@ while running == True:
             case "login":
                 buttonList.append(Button(usernameButtonPos, 100, 60, False, mainSurface, (150, 180, 210), "Username", regFont, True, focusUsername))
                 buttonList.append(Button(passwordButtonPos, 100, 60, False, mainSurface, (150, 180, 210), "Password", regFont, True, focusPassword))
+                buttonList.append(Button((loginLeftMargin-loginColumGap-int(loginButtonsWidth/2), passwordButtonPos[1]+100), loginButtonsWidth, 40, False, mainSurface, (200, 200, 200), "Login", regFont, False, doLogin))
+                buttonList.append(Button((loginLeftMargin+int(loginButtonsWidth/2), passwordButtonPos[1]+100), loginButtonsWidth, 40, False, mainSurface, (200, 200, 200), "Signup", regFont, False, doSignup))
         firstFrame = False
     match menu:
         case "main":
@@ -258,14 +278,14 @@ while running == True:
                     button.drawSelf(loginLeftMargin)
                 else:
                     button.drawSelf()
-            size = regFont.size("Username: ")
-            textRender = regFont.render("Username: ", False, 0)
-            mainSurface.blit(textRender, (loginLeftMargin-10-size[0], usernameButtonPos[1]-size[1]/2))
+            size = regFont.size("Username:")
+            textRender = regFont.render("Username:", False, 0)
+            mainSurface.blit(textRender, (loginLeftMargin-loginColumGap-size[0], usernameButtonPos[1]-size[1]/2))
             textRender = regFont.render("Password: ", False, 0)
-            mainSurface.blit(textRender, (loginLeftMargin-10-size[0], passwordButtonPos[1]-size[1]/2))
+            mainSurface.blit(textRender, (loginLeftMargin-loginColumGap-size[0], passwordButtonPos[1]-size[1]/2))
             if loginAlertText != "":
                 size = regFont.size(loginAlertText)
-                textRender = regFont.render(loginAlertText, False, 0)
+                textRender = regFont.render(loginAlertText, False, (230, 20, 20))
                 mainSurface.blit(textRender, (640-size[0]/2, 120-size[1]/2))
     #Render End Here
 
