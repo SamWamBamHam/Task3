@@ -77,14 +77,18 @@ def unfocus():
     focusedTextbox = None
     typedText = ""
     pygame.key.stop_text_input()
+    button = findIndexOfButtonByFunction(buttonList, focusPassword)
+    buttonList.remove(button)
     if passwordText == "":
-        button = findIndexOfButtonByFunction(buttonList, focusPassword)
-        buttonList.remove(button)
         buttonList.append(Button(passwordButtonPos, 100, 60, False, mainSurface, (150, 180, 210), "Password", regFont, True, focusPassword))
+    else:
+        buttonList.append(Button(passwordButtonPos, 100, 60, False, mainSurface, (150, 180, 210), passwordText, regFont, True, focusPassword))
+    button = findIndexOfButtonByFunction(buttonList, focusUsername)
+    buttonList.remove(button)
     if usernameText == "":
-        button = findIndexOfButtonByFunction(buttonList, focusUsername)
-        buttonList.remove(button)
         buttonList.append(Button(usernameButtonPos, 100, 60, False, mainSurface, (150, 180, 210), "Username", regFont, True, focusUsername))
+    else:
+        buttonList.append(Button(usernameButtonPos, 100, 60, False, mainSurface, (150, 180, 210), usernameText, regFont, True, focusUsername))
 
 def focusUsername():
     global focusedTextbox, usernameText, typedText, buttonList
@@ -93,7 +97,7 @@ def focusUsername():
     pygame.key.start_text_input()
     button = findIndexOfButtonByFunction(buttonList, focusUsername)
     buttonList.remove(button)
-    buttonList.append(Button(usernameButtonPos, 100, 60, False, mainSurface, (150, 180, 210), typedText, regFont, True, focusUsername))
+    buttonList.append(Button(usernameButtonPos, 100, 60, False, mainSurface, (170, 200, 230), usernameText, regFont, True, focusUsername))
 
 def focusPassword():
     global focusedTextbox, typedText, passwordText, buttonList
@@ -102,13 +106,13 @@ def focusPassword():
     pygame.key.start_text_input()
     button = findIndexOfButtonByFunction(buttonList, focusPassword)
     buttonList.remove(button)
-    buttonList.append(Button(passwordButtonPos, 100, 60, False, mainSurface, (150, 180, 210), typedText, regFont, True, focusPassword))
+    buttonList.append(Button(passwordButtonPos, 100, 60, False, mainSurface, (170, 200, 230), passwordText, regFont, True, focusPassword))
 
 while running == True:
 
     # Inputs work by figuring out everything that happened this frame, then resolving them dependent
     # on which menu your are currently in
-    leftClick, rightClick, rClick, escClick = False, False, False, False
+    leftClick, rightClick, rClick, escClick, tabClick = False, False, False, False, False
     typedButton = None
     for event in pygame.event.get():
         if event.type == pygame.QUIT:    
@@ -125,6 +129,8 @@ while running == True:
                 escClick = True
             elif event.key == pygame.K_BACKSPACE:
                 holdingBackspace = True
+            elif event.key == pygame.K_TAB:
+                tabClick = True
 
         elif event.type == pygame.KEYUP:
             if event.key == pygame.K_LCTRL:
@@ -209,13 +215,21 @@ while running == True:
                     button = findIndexOfButtonByFunction(buttonList, focusUsername)
                     buttonList.remove(button)
                     del button
-                    buttonList.append(Button(usernameButtonPos, 100, 60, False, mainSurface, (150, 180, 210), typedText, regFont, True, focusUsername))
+                    buttonList.append(Button(usernameButtonPos, 100, 60, False, mainSurface, (170, 200, 230), typedText, regFont, True, focusUsername))
                 elif focusedTextbox == "password":
                     passwordText = typedText
                     button = findIndexOfButtonByFunction(buttonList, focusPassword)
                     buttonList.remove(button)
                     del button
-                    buttonList.append(Button(passwordButtonPos, 100, 60, False, mainSurface, (150, 180, 210), typedText, regFont, True, focusPassword))
+                    buttonList.append(Button(passwordButtonPos, 100, 60, False, mainSurface, (170, 200, 230), typedText, regFont, True, focusPassword))
+            if tabClick:
+                match focusedTextbox:
+                    case "username":
+                        unfocus()
+                        focusPassword()
+                    case "password":
+                        unfocus()
+                        focusUsername()
 
     mainSurface.fill("purple")
 
@@ -252,6 +266,9 @@ while running == True:
         case "main":
             for button in buttonList:
                 button.drawSelf()
+            textRender = bigFont.render(f"User: {username}", False, 0)
+            sizeOf = bigFont.size(f"User: {username}")
+            mainSurface.blit(textRender, (100, 100+sizeOf[1]))
         case "hex":
             mainSurface.fill((185, 226, 245))
             for button in buttonList:
