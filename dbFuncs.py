@@ -1,12 +1,25 @@
 import sqlite3
 
-def getAll(username):
+def getAll(username: str):
     con = sqlite3.connect("data.db")
     cur = con.cursor()
     result = cur.execute(f"SELECT * FROM users WHERE username == '{username}';")
     return result.fetchone()
 
-def login(username, password):
+def addToVars(username: str, newWins: int = 0, newGames: int = 0, newTime: int = 0, newFlags: int = 0, newRevealed: int = 0):
+    null1, null2, wins, games, time, flags, revealed = getAll(username)
+    del null1, null2
+    wins += newWins
+    games += newGames
+    time += newTime
+    flags += newFlags
+    revealed += newRevealed
+    con = sqlite3.connect("data.db")
+    cur = con.cursor()
+    cur.execute(f"UPDATE users SET totalGames = {games}, totalWins = {wins}, totalTime = {time}, totalFlags = {flags}, totalRevealed = {revealed} WHERE username = '{username}';")
+    con.commit()
+
+def login(username: str, password: str):
     con = sqlite3.connect("data.db")
     cur = con.cursor()
     result = cur.execute(f"SELECT password FROM users WHERE username == '{username}';")
@@ -19,7 +32,7 @@ def login(username, password):
     else:
         return False
     
-def signUp(username, password):
+def signUp(username: str, password: str):
     con = sqlite3.connect("data.db")
     cur = con.cursor()
     result = cur.execute(f"SELECT * FROM users WHERE username == '{username}';")

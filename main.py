@@ -1,9 +1,10 @@
 import pygame
-from hexArray import createHexArray, drawHexArray, revealTile, flagTile, countUnflagged
+from time import monotonic
+from hexArray import createHexArray, drawHexArray, revealTile, flagTile, countUnflagged, collectHexReferences
 from hexagon import Hexagon
 from button import Button
 from buttonFuncs import findClosestButton, findIndexOfButtonByFunction
-from dbFuncs import getAll, login, signUp
+from dbFuncs import getAll, login, signUp, addToVars
 
 pygame.init()
 mainSurface = pygame.display.set_mode((1280, 720))
@@ -34,16 +35,40 @@ loginAlertText = ""
 loginButtonsWidth = 100
 loginColumGap = 20
 username = None
+startTime = 0
+addedToDb = True
 
 def goToHex():
-    global firstFrame, menu
+    global firstFrame, menu, startTime, addedToDb
     firstFrame = True
     menu = "hex"
+    if not addedToDb:
+        addToDb()
+    startTime = monotonic()
+    addedToDb = False
 
 def goToMain():
     global firstFrame, menu
     firstFrame = True
+    if menu == "hex":
+        addToDb()
     menu = "main"
+
+def addToDb():
+    global hexGrid, startTime, addedToDb
+    revealed, flagged = 0, 0
+    success = True
+    for hex in collectHexReferences(hexGrid):
+        assert isinstance(hex, Hexagon)
+        if hex.getFlagged():
+            flagged += 1
+        elif hex.getRevealed() and not hex.getMine():
+            revealed += 1
+        if (not hex.getRevealed() and not hex.getMine()) or (hex.getMine() and hex.getRevealed()):
+            success = False
+    totalTime = int((monotonic() - startTime)*1000)
+    addToVars(username, 1 if success else 0, 1, totalTime, flagged, revealed)
+    addedToDb = True
 
 def goToStats():
     global firstFrame, menu
@@ -51,7 +76,9 @@ def goToStats():
     menu = "stats"
 
 def quit():
-    global running
+    global running, menu
+    if menu == "hex":
+        addToDb()
     running = False
 
 def doSignup():
@@ -251,10 +278,8 @@ while running == True:
                 pixelSize = 30
                 hexFont = pygame.font.Font(size=pixelSize)
                 hexGrid = createHexArray(gameSize, mainSurface, pixelSize)
-                for row in hexGrid:
-                    for cell in row:
-                        if isinstance(cell, Hexagon):
-                            buttonList.append(cell)
+                for hex in collectHexReferences(hexGrid):
+                    buttonList.append(hex)
                 buttonList.append(Button((1140, 80), 140, 60, False, mainSurface, (160, 200, 180), "Restart (R)", regFont, False, goToHex))
                 buttonList.append(Button((1140, 170), 140, 60, False, mainSurface, (160, 200, 180), "Back to Menu", regFont, False, goToMain))
             case "stats":
