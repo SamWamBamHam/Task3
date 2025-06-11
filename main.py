@@ -115,43 +115,46 @@ while running == True:
     leftClick, rightClick, rClick, escClick, tabClick = False, False, False, False, False
     typedButton = None
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:    
-            quit()
+        match event.type:
+            case pygame.QUIT:
+                quit()
 
         # Rather than checking each frame, check when the left ctrl state changes
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_LCTRL:
-                holdingLCtrl = True
-            elif event.key == pygame.K_r:
-                rClick = True
-            elif event.key == pygame.K_ESCAPE:
-                holdingEsc = True
-                escClick = True
-            elif event.key == pygame.K_BACKSPACE:
-                holdingBackspace = True
-            elif event.key == pygame.K_TAB:
-                tabClick = True
+            case pygame.KEYDOWN:
+                match event.key:
+                    case pygame.K_LCTRL:
+                        holdingLCtrl = True
+                    case pygame.K_r:
+                        rClick = True
+                    case pygame.K_ESCAPE:
+                        holdingEsc = True
+                        escClick = True
+                    case pygame.K_BACKSPACE:
+                        holdingBackspace = True
+                    case pygame.K_TAB:
+                        tabClick = True
 
-        elif event.type == pygame.KEYUP:
-            if event.key == pygame.K_LCTRL:
-                holdingLCtrl = False
-            elif event.key == pygame.K_ESCAPE:
-                holdingEsc = False
-            elif event.key == pygame.K_BACKSPACE:
-                holdingBackspace = False
-                backspaceFrames = 0
+            case pygame.KEYUP:
+                match event.key:
+                    case pygame.K_LCTRL:
+                        holdingLCtrl = False
+                    case pygame.K_ESCAPE:
+                        holdingEsc = False
+                    case pygame.K_BACKSPACE:
+                        holdingBackspace = False
+                        backspaceFrames = 0
 
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            position = (event.pos[0], event.pos[1])
-            if event.button == 3 or (event.button == 1 and holdingLCtrl):
-                rightClick = True
-            elif event.button == 1:
-                leftClick = True
+            case pygame.MOUSEBUTTONDOWN:
+                position = (event.pos[0], event.pos[1])
+                if event.button == 3 or (event.button == 1 and holdingLCtrl):
+                    rightClick = True
+                elif event.button == 1:
+                    leftClick = True
 
-        elif event.type == pygame.TEXTINPUT:
-            typedButton = event.text
-            if typedButton in bannedCharacters:
-                typedButton = None
+            case pygame.TEXTINPUT:
+                typedButton = event.text
+                if typedButton in bannedCharacters:
+                    typedButton = None
 
     match menu:
         case "main":
