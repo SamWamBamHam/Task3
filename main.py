@@ -37,6 +37,7 @@ loginColumGap = 20
 username = None
 startTime = 0
 addedToDb = True
+update = True
 
 def goToHex():
     global firstFrame, menu, startTime, addedToDb
@@ -267,6 +268,7 @@ while running == True:
     if firstFrame:
         textToggle = False
         pygame.key.stop_text_input()
+        update = True
         buttonList = []
         match menu:
             case "main":
@@ -283,7 +285,16 @@ while running == True:
                 buttonList.append(Button((1140, 80), 140, 60, False, mainSurface, (160, 200, 180), "Restart (R)", regFont, False, goToHex))
                 buttonList.append(Button((1140, 170), 140, 60, False, mainSurface, (160, 200, 180), "Back to Menu", regFont, False, goToMain))
             case "stats":
-                pass
+                null1, null2, games, wins, time, wins, flags = getAll(username)
+                textRender = bigFont.render("Stats", False, 0)
+                size = bigFont.size("Stats")
+                mainSurface.blit(textRender, (640-size[0], 50))
+                currentText = f"Total Games: {str(games)}"
+                textRender = regFont.render(currentText, False, 0)
+                size = regFont.size(currentText)
+
+                # CHANGE TEMP DO SOMETHING
+                
             case "login":
                 buttonList.append(Button(usernameButtonPos, 100, 60, False, mainSurface, (150, 180, 210), "Username", regFont, True, focusUsername))
                 buttonList.append(Button(passwordButtonPos, 100, 60, False, mainSurface, (150, 180, 210), "Password", regFont, True, focusPassword))
@@ -295,8 +306,8 @@ while running == True:
             for button in buttonList:
                 button.drawSelf()
             textRender = bigFont.render(f"User: {username}", False, 0)
-            sizeOf = bigFont.size(f"User: {username}")
-            mainSurface.blit(textRender, (100, 100+sizeOf[1]))
+            size = bigFont.size(f"User: {username}")
+            mainSurface.blit(textRender, (100, 100+size[1]))
         case "hex":
             mainSurface.fill((185, 226, 245))
             for button in buttonList:
@@ -334,7 +345,10 @@ while running == True:
                 mainSurface.blit(textRender, (640-size[0]/2, 120-size[1]/2))
     #Render End Here
 
-    pygame.display.flip()
+    if update:
+        pygame.display.flip()
+        if menu == "stats":
+            update = False
 
     clock.tick(60)
 
