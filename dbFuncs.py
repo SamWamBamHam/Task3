@@ -7,7 +7,7 @@ def getAll(username: str):
     return result.fetchone()
 
 def addToVars(username: str, newWins: int = 0, newGames: int = 0, newTime: int = 0, newFlags: int = 0, newRevealed: int = 0):
-    null1, null2, wins, games, time, flags, revealed = getAll(username)
+    null1, null2, games, wins, time, flags, revealed = getAll(username)
     del null1, null2
     wins += newWins
     games += newGames

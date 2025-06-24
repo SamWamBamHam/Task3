@@ -5,7 +5,7 @@ from random import randint
 # I wanted to do this as a class, but I realised that that goes against design principles since there
 # is only ever one. I still never spoke from main to hex, always used the hexArray as a middle man
 
-#Store this:   _         Like this:   [[" ", "1", " "]    In the createHexArray function
+# Store this:  _         Like this:   [[" ", "1", " "]    In the createHexArray function
 #            _/1\_                     ["6", " ", "2"]
 #           /6\_/2\                    [" ", "0", " "]
 #           \_/0\_/                    ["5", " ", "3"]
