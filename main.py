@@ -5,6 +5,7 @@ from hexagon import Hexagon
 from button import Button
 from buttonFuncs import findClosestButton, findIndexOfButtonByFunction
 from dbFuncs import getAll, login, signUp, addToVars
+from text import Text
 
 pygame.init()
 mainSurface = pygame.display.set_mode((1280, 720))
@@ -20,6 +21,7 @@ gameSize = 7
 regFont = pygame.font.Font(size = 30)
 bigFont = pygame.font.Font(size = 60)
 buttonList = []
+textList = []
 hexGrid = None
 escCounter = 0
 gameState = None
@@ -270,6 +272,7 @@ while running == True:
         pygame.key.stop_text_input()
         update = True
         buttonList = []
+        textList = []
         match menu:
             case "main":
                 buttonList.append(Button((640, 440), 100, 60, False, mainSurface, (112, 142, 160), "Go to hex", regFont, False, goToHex))
@@ -285,13 +288,22 @@ while running == True:
                 buttonList.append(Button((1140, 80), 140, 60, False, mainSurface, (160, 200, 180), "Restart (R)", regFont, False, goToHex))
                 buttonList.append(Button((1140, 170), 140, 60, False, mainSurface, (160, 200, 180), "Back to Menu", regFont, False, goToMain))
             case "stats":
-                null1, null2, games, wins, time, wins, flags = getAll(username)
-                textRender = bigFont.render("Stats", False, 0)
-                size = bigFont.size("Stats")
-                mainSurface.blit(textRender, (640-size[0], 50))
-                currentText = f"Total Games: {str(games)}"
-                textRender = regFont.render(currentText, False, 0)
-                size = regFont.size(currentText)
+                null1, null2, games, wins, time, flags, revealed = getAll(username)
+                statsPos = (640, 160)
+                textList.append(Text(statsPos, "right", "Wins: ", regFont, mainSurface))
+                textList.append(Text((statsPos[0], statsPos[1]+70), "right", "Losses: ", regFont, mainSurface))
+                textList.append(Text((statsPos[0], statsPos[1]+140), "right", "Win Rate: ", regFont, mainSurface))
+                textList.append(Text((statsPos[0], statsPos[1]+210), "right", "Avg Game Time: ", regFont, mainSurface))
+                textList.append(Text((statsPos[0], statsPos[1]+280), "right", "Total Flags: ", regFont, mainSurface))
+                textList.append(Text((statsPos[0], statsPos[1]+350), "right", "Total Revealed: ", regFont, mainSurface))
+
+                textList.append(Text(statsPos, "left", str(wins), regFont, mainSurface))
+                textList.append(Text((statsPos[0], statsPos[1]+70), "left", str(games-wins), regFont, mainSurface))
+                textList.append(Text((statsPos[0], statsPos[1]+140), "left", f"{round((1-wins/games)*100)}%", regFont, mainSurface))
+                textList.append(Text((statsPos[0], statsPos[1]+210), "left", f"{round(time/1000/games)} seconds", regFont, mainSurface))
+                textList.append(Text((statsPos[0], statsPos[1]+280), "left", str(flags), regFont, mainSurface))
+                textList.append(Text((statsPos[0], statsPos[1]+350), "left", str(revealed), regFont, mainSurface))
+
 
                 # CHANGE TEMP DO SOMETHING
                 
@@ -327,7 +339,8 @@ while running == True:
                     mainSurface.blit(failureTextSurface, (50, 50))
             drawHexArray(hexGrid, hexFont, gameState == None)
         case "stats":
-            pass
+            for text in textList:
+                text.drawSelf()
         case "login":
             for button in buttonList:
                 if button.getClickFunction() in (focusPassword, focusUsername):
@@ -349,6 +362,9 @@ while running == True:
         pygame.display.flip()
         if menu == "stats":
             update = False
+    else:
+        if menu != "stats":
+            update = True
 
     clock.tick(60)
 
