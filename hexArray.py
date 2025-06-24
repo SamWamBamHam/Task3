@@ -121,9 +121,11 @@ def revealTile(grid, coord, minePercentage=0, doSpread = False):
             # After the first click we distribute mines. Therefore the first click is always safe.
             # Common feature in minesweeper, known as Safe Start
             safeSquareCoords = [coord, (coord[0]+1, coord[1]+1), (coord[0]+1, coord[1]-1), (coord[0]-1, coord[1]+1), (coord[0]-1, coord[1]-1), (coord[0], coord[1]+2), (coord[0], coord[1]-2)]
+            newSSC = [safeSquareCoords[i] for i in range(7)]
             for sSCoord in safeSquareCoords:
                 if not isinstance(grid[sSCoord[1]][sSCoord[0]], Hexagon):
-                    safeSquareCoords.remove(sSCoord)
+                    newSSC.remove(sSCoord)
+            safeSquareCoords = newSSC
             distributeMines(grid, minePercentage, safeSquareCoords)
         if not closestHex.getFlagged():
             if closestHex.getRevealed():

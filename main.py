@@ -142,7 +142,7 @@ while running == True:
 
     # Inputs work by figuring out everything that happened this frame, then resolving them dependent
     # on which menu your are currently in
-    leftClick, rightClick, rClick, escClick, tabClick = False, False, False, False, False
+    leftClick, rightClick, rClick, escClick, tabClick, returnClick = (False for i in range(6))
     typedButton = None
     for event in pygame.event.get():
         match event.type:
@@ -163,6 +163,8 @@ while running == True:
                         holdingBackspace = True
                     case pygame.K_TAB:
                         tabClick = True
+                    case pygame.K_RETURN:
+                        returnClick = True
 
             case pygame.KEYUP:
                 match event.key:
@@ -263,6 +265,8 @@ while running == True:
                     case "password":
                         unfocus()
                         focusUsername()
+            if returnClick:
+                doLogin()
 
     mainSurface.fill("purple")
 
@@ -303,9 +307,6 @@ while running == True:
                 textList.append(Text((statsPos[0], statsPos[1]+210), "left", f"{round(time/1000/games)} seconds", regFont, mainSurface))
                 textList.append(Text((statsPos[0], statsPos[1]+280), "left", str(flags), regFont, mainSurface))
                 textList.append(Text((statsPos[0], statsPos[1]+350), "left", str(revealed), regFont, mainSurface))
-
-
-                # CHANGE TEMP DO SOMETHING
                 
             case "login":
                 buttonList.append(Button(usernameButtonPos, 100, 60, False, mainSurface, (150, 180, 210), "Username", regFont, True, focusUsername))
