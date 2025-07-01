@@ -268,6 +268,13 @@ while running == True:
             if returnClick:
                 doLogin()
 
+        case "stats":
+            if leftClick:
+                closestButton = findClosestButton(buttonList, position)
+                if closestButton:
+                    clickFunction = closestButton.getClickFunction()
+                    clickFunction()
+
     mainSurface.fill("purple")
 
     #Render Start Here
@@ -294,19 +301,25 @@ while running == True:
             case "stats":
                 null1, null2, games, wins, time, flags, revealed = getAll(username)
                 statsPos = (640, 160)
-                textList.append(Text(statsPos, "right", "Wins: ", regFont, mainSurface))
-                textList.append(Text((statsPos[0], statsPos[1]+70), "right", "Losses: ", regFont, mainSurface))
-                textList.append(Text((statsPos[0], statsPos[1]+140), "right", "Win Rate: ", regFont, mainSurface))
-                textList.append(Text((statsPos[0], statsPos[1]+210), "right", "Avg Game Time: ", regFont, mainSurface))
-                textList.append(Text((statsPos[0], statsPos[1]+280), "right", "Total Flags: ", regFont, mainSurface))
-                textList.append(Text((statsPos[0], statsPos[1]+350), "right", "Total Revealed: ", regFont, mainSurface))
+                cFont = bigFont
+                vertDist = 90
+                textList.append(Text((statsPos[0], round(statsPos[1]-vertDist*1.5)), "centre", "Stats", bigFont, mainSurface))
 
-                textList.append(Text(statsPos, "left", str(wins), regFont, mainSurface))
-                textList.append(Text((statsPos[0], statsPos[1]+70), "left", str(games-wins), regFont, mainSurface))
-                textList.append(Text((statsPos[0], statsPos[1]+140), "left", f"{round((1-wins/games)*100)}%", regFont, mainSurface))
-                textList.append(Text((statsPos[0], statsPos[1]+210), "left", f"{round(time/1000/games)} seconds", regFont, mainSurface))
-                textList.append(Text((statsPos[0], statsPos[1]+280), "left", str(flags), regFont, mainSurface))
-                textList.append(Text((statsPos[0], statsPos[1]+350), "left", str(revealed), regFont, mainSurface))
+                textList.append(Text(statsPos, "right", "Wins: ", cFont, mainSurface))
+                textList.append(Text((statsPos[0], statsPos[1]+vertDist), "right", "Losses: ", cFont, mainSurface))
+                textList.append(Text((statsPos[0], statsPos[1]+vertDist*2), "right", "Win Rate: ", cFont, mainSurface))
+                textList.append(Text((statsPos[0], statsPos[1]+vertDist*3), "right", "Avg Game Time: ", cFont, mainSurface))
+                textList.append(Text((statsPos[0], statsPos[1]+vertDist*4), "right", "Total Flags: ", cFont, mainSurface))
+                textList.append(Text((statsPos[0], statsPos[1]+vertDist*5), "right", "Total Revealed: ", cFont, mainSurface))
+
+                textList.append(Text(statsPos, "left", str(wins), cFont, mainSurface))
+                textList.append(Text((statsPos[0], statsPos[1]+vertDist), "left", str(games-wins), cFont, mainSurface))
+                textList.append(Text((statsPos[0], statsPos[1]+vertDist*2), "left", f"{round(wins/games*100)}%", cFont, mainSurface))
+                textList.append(Text((statsPos[0], statsPos[1]+vertDist*3), "left", f"{round(time/1000/games)} seconds", cFont, mainSurface))
+                textList.append(Text((statsPos[0], statsPos[1]+vertDist*4), "left", str(flags), cFont, mainSurface))
+                textList.append(Text((statsPos[0], statsPos[1]+vertDist*5), "left", str(revealed), cFont, mainSurface))
+
+                buttonList.append(Button((100, 100), 50, 50, True, mainSurface, (230, 60, 60), "X", bigFont, False, goToMain))
                 
             case "login":
                 buttonList.append(Button(usernameButtonPos, 100, 60, False, mainSurface, (150, 180, 210), "Username", regFont, True, focusUsername))
@@ -342,6 +355,8 @@ while running == True:
         case "stats":
             for text in textList:
                 text.drawSelf()
+            for button in buttonList:
+                button.drawSelf()
         case "login":
             for button in buttonList:
                 if button.getClickFunction() in (focusPassword, focusUsername):
@@ -359,13 +374,7 @@ while running == True:
                 mainSurface.blit(textRender, (640-size[0]/2, 120-size[1]/2))
     #Render End Here
 
-    if update:
-        pygame.display.flip()
-        if menu == "stats":
-            update = False
-    else:
-        if menu != "stats":
-            update = True
+    pygame.display.flip()
 
     clock.tick(60)
 
