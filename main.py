@@ -275,7 +275,7 @@ while running == True:
                     clickFunction = closestButton.getClickFunction()
                     clickFunction()
 
-    mainSurface.fill("purple")
+    mainSurface.fill((185, 226, 245))
 
     #Render Start Here
     if firstFrame:
@@ -286,9 +286,9 @@ while running == True:
         textList = []
         match menu:
             case "main":
-                buttonList.append(Button((640, 440), 100, 60, False, mainSurface, (112, 142, 160), "Go to hex", regFont, False, goToHex))
-                buttonList.append(Button((1200, 80), 100, 100, False, mainSurface, (200, 170, 117), "Quit (Hold Esc)", regFont, True, quit))
-                buttonList.append(Button((640, 640), 100, 60, False, mainSurface, (112, 142, 160), "Go to Stats", regFont, False, goToStats))
+                buttonList.append(Button((640, 400), 150, 70, False, mainSurface, (112, 142, 160), "Go to hex", regFont, False, goToHex))
+                buttonList.append(Button((1150, 80), 100, 100, False, mainSurface, (200, 170, 117), "Quit (Hold Esc)", regFont, True, quit))
+                buttonList.append(Button((640, 620), 150, 70, False, mainSurface, (112, 142, 160), "Go to Stats", regFont, False, goToStats))
             case "hex":
                 gameState = None
                 pixelSize = 30
@@ -335,7 +335,6 @@ while running == True:
             size = bigFont.size(f"User: {username}")
             mainSurface.blit(textRender, (100, 100+size[1]))
         case "hex":
-            mainSurface.fill((185, 226, 245))
             for button in buttonList:
                 if not isinstance(button, Hexagon):
                     button.drawSelf()
