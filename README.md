@@ -9,6 +9,8 @@ To use the program:
 
 Note: For some reason a simple double click to run in terminal does not work.
 
+
+Ctrl + m1 acts as m2 in game.
 When playing, you might see incredibly cool things, such as:
 1. Minesweeper. ![image](https://github.com/user-attachments/assets/057a62ed-b96e-431b-b93b-c483b7af5027)
 2. More minesweeper.
